@@ -9,7 +9,7 @@ int main(int argc, char *argv[]){
     }else if(argc == 3){
         pic_data *out = (pic_data *)malloc(sizeof(pic_data));
         detect_png(argv[1], out);
-        char *prv_words = base64_encode(argv[2], strlen(argv[2]));
+        char *prv_words = base64_encode(argv[2], (int)strlen(argv[2]));
         int max_data_length = ((out->width - 2) * (out->height - 2) * 3 - 1) / 8;
         int channels = out->channels;
         if(out->bit_depth != 8){
@@ -20,16 +20,18 @@ int main(int argc, char *argv[]){
             fprintf(stderr, "only support 3 channels pictures\n");
             png_destroy_read_struct(&out->png_ptr, &out->info_ptr, 0);
             exit(-1);
-        } else if(out->width < 3 || out->height < 3 || max_data_length < strlen(prv_words)){
+        }else if(out->width < 3 || out->height < 3 || max_data_length < strlen(prv_words)){
             fprintf(stderr, "too small pictures");
             png_destroy_read_struct(&out->png_ptr, &out->info_ptr, 0);
             exit(-1);
         }
+//        printf("width=%d height=%d\n", out->width, out->height);
         char *words = txt2bin(prv_words);
         int words_len = (int)strlen(words);
+        int row_lengths = (out->width - 2) * 3;
         for(int i = 0; i < words_len; i++){
-            int x = i / ((out->height - 2) * 3) + 1;
-            int y = i % ((out->width - 2) * 3) + 3;
+            int x = i / row_lengths + 1;
+            int y = i % row_lengths + 3;
             if(words[i] == '0'){
                 int data = out->rgba[x][y];
                 if(data % 2){
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]){
         out->rgba[0][0] = 'r';
         out->rgba[0][out->width*3-2] = 'g';
         out->rgba[out->height-1][out->width*3-1] = 'b';
-        out->rgba[(words_len+1)/((out->height - 2) * 3) + 1][(words_len+1)%((out->height - 2) * 3) + 2] = 'e';
+        out->rgba[(words_len+1)/row_lengths + 1][(words_len+1)%row_lengths + 2] = 'e';
         write_png_file("out.png", out);
         png_destroy_read_struct(&out->png_ptr, &out->info_ptr, 0);
         free(words);
@@ -65,7 +67,6 @@ int main(int argc, char *argv[]){
         pic_data *out = (pic_data *)malloc(sizeof(pic_data));
         detect_png(argv[1], out);
         int max_data_length = ((out->width - 2) * (out->height - 2) * 3 - 1) / 8;
-//        printf("max=%d\n", max_data_length);
         char *words = (char *)malloc(max_data_length * sizeof(char) + 1);
         int check_r = out->rgba[0][0];
         int check_g = out->rgba[0][out->width*3-2];
@@ -95,8 +96,10 @@ int main(int argc, char *argv[]){
         words[cnt] = '\0';
 //        puts(words);
         char *prv_ret = bin2txt(words);
-        char *ret = base64_decode(prv_ret, strlen(prv_ret));
+        char *ret = base64_decode(prv_ret, (int)strlen(prv_ret));
+        free(prv_ret);
         puts(ret);
+        free(ret);
         return 0;
     }
 }
