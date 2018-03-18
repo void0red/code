@@ -24,7 +24,14 @@
    int write_png_file(char *file_name , pic_data *graph);//重写png文件
    ```
 
-3. 没有了
+3. `chrlib.c`
+
+   ```c
+   char *txt2bin(char *src);//文本转二进制
+   char *bin2txt(char *src);//二进制转文本
+   ```
+
+   ​
 
 //TODO
 
