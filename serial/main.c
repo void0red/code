@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <memory.h>
 #include <stdlib.h>
-#include <zconf.h>
 #include <pwd.h>
 #include "base64.h"
 #include "md5.h"
