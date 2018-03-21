@@ -1,15 +1,18 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <memory.h>
 #include <stdlib.h>
 #include <zconf.h>
+#include <pwd.h>
 #include "base64.h"
 #include "md5.h"
 #include "client.h"
 static void *func(char *in, int n);
 int main() {
     char buf[1024];
-    getcwd(buf, sizeof(buf));
-    char *out = base64_encode(buf, sizeof(buf));
+    struct passwd *pwd = getpwuid(getuid());
+    char *name = pwd->pw_name;
+    char *out = base64_encode(name, sizeof(name));
     func(out, 15);
     printf("SN: %s\nKEY: ", out);
     char *key = client(out);
